@@ -49,10 +49,10 @@ Content-Type: application/vnd.restafarian.resource.v1+json
 
 ### Creating a new resource
 
-The client proceeds to ask the server to define the user resource using the HTTP OPTIONS method and the definition media type as JavaScript.
+The client proceeds to ask the server to define the user resource using the definition media type as JavaScript.
 
 ```
-OPTIONS /user HTTP/1.1
+GET /user HTTP/1.1
 Host: api.example.com
 Accept: application/vnd.restafarian.definition.v1+javascript
 ```
@@ -73,7 +73,7 @@ function User(user) {
     this.password = user.password;
     this.password_confirmation = user.password_confirmation;
     this.accept_terms = user.terms;
-    this.gender = user.gender;
+    this.colour_preference = user.colour_preference;
     this.date_of_birth = user.date_of_birth;
 }
 
@@ -95,13 +95,14 @@ User.properties = {
     },
     accept_terms: {
         localized_name: "Accept Terms & Conditions",
-        type: Boolean
+        type: "checkbox"
     },
-    gender: {
-        localized_name: "Gender",
+    colour_preference: {
+        localized_name: "Favourite colour",
         type: {
-            "Male": "M",
-            "Female": "F"
+            "Red": "red",
+            "Green": "green",
+            "Blue": "blue"
         }
     },
     date_of_birth: {
@@ -133,14 +134,14 @@ User.prototype.validate = function () {
     }
 
     if (["M", "F"].indexOf(this.gender) < 0) {
-        errors.gender.push("must be Male or Female");
+        errors.gender.push("must be red, green, or blue");
     }
 
     return errors;
 };
 ```
 
-The response defines an object named after the resource with a static property denoting its properties. The properties are annotated with a localized description for the client to display to the end-user and a type. The localization is determined via content negotiation in the request. The type can be an instance of `String` where the value is a hint to the client on what input to display to the end-user, e.g. secure text fields for passwords, file inputs for files, or custom keyboard inputs (numeric, email, etc). Valid values for `type` when it is a string are `"boolean"` and those corresponding to valid values for the `type` attribute of HTML 5 form inputs. A type may also be a Javascript Object, in this case the client must assume it is equivalent to an enum type where the keys are localized names and the values are the enum constants. The client should take the annotations into account when deciding the type of input to display to the end-user.
+The response defines an object named after the resource with a static property denoting its properties. The properties are annotated with a localized description for the client to display to the end-user and a type. The localization is determined via content negotiation in the request. The type can be an instance of `String` where the value is a hint to the client on what input to display to the end-user, e.g. secure text fields for passwords, file inputs for files, or custom keyboard inputs (numeric, email, etc). Valid values for `type` when it is a string are those corresponding to valid values for the `type` attribute of HTML 5 form inputs. A type may also be a Javascript Object, in this case the client must assume it is equivalent to an enum type where the keys are localized names and the values are the enum constants. The client should take the annotations into account when deciding the type of input to display to the end-user.
 
 The object can be instantiated with new JSON representations and validated. The validation method returns a JSON object where the keys correspond to the resource properties and the value is an array of localized error messages pertaining to the property. An empty array denotes the property is provisionally free of errors, but this is non-authoritative, the server is.
 
@@ -169,13 +170,14 @@ Content-Type: application/vnd.restafarian.definition.v1+json
     },
     "accept_terms": {
         "localized_name": "Accept Terms & Conditions",
-        "type": "boolean"
+        "type": "checkbox"
     },
-    "gender": {
-        "localized_name": "Gender",
+    "colour_preference": {
+        "localized_name": "Favourite colour",
         "type": {
-            "Male": "M",
-            "Female": "F"
+            "Red": "red",
+            "Green": "green",
+            "Blue": "blue"
         }
     },
     "date_of_birth": {
