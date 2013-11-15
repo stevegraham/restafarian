@@ -21,14 +21,15 @@ A client enters a hypothetical API at http://api.example.com with the request:
 ```
 GET / HTTP/1.1
 Host: api.example.com
-Accept: application/vnd.restafarian.resource.v1+json
+Accept: application/vnd.restafarian.resource.v1; version=1
 ```
 
 The server responds with a JSON representation of the resource with links to related resources:
 
 ```
 HTTP/1.1 200 OK
-Content-Type: application/vnd.restafarian.resource.v1+json
+Content-Type: application/vnd.restafarian.resource+json; version=1
+Vary: Content-Type
 
 {
   "subresources": {
@@ -54,7 +55,7 @@ The client proceeds to ask the server to define the user resource using the defi
 ```
 GET /user HTTP/1.1
 Host: api.example.com
-Accept: application/vnd.restafarian.definition.v1+javascript
+Accept: application/vnd.restafarian.definition+javascript; version=1
 ```
 
 The server responds with the acceptable HTTP methods which may be used against the resource and code on demand describing the resource, providing a validation function allowing the client to perform initial validation on new representations. 
@@ -64,7 +65,8 @@ Client side validations are NON-authoritative. Representations that do not retur
 ```
 HTTP/1.1 200 OK
 Allow: PUT, PATCH, GET, HEAD, OPTIONS
-Content-Type: application/vnd.restafarian.definition.v1+javascript
+Content-Type: application/vnd.restafarian.definition+javascript; version=1
+Vary: Content-Type
 
 function User(user) {
     "use strict";
