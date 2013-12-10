@@ -1,0 +1,2 @@
+module Restafarian
+end
