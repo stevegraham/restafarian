@@ -1,5 +1,7 @@
 # Restafarian
 
+### Experimental!
+
 A tool for implementing real REST HTTP APIs. 
 
 __Caveat__: This is a work in progress, under active development, and unstable.
