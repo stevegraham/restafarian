@@ -2,7 +2,7 @@ Dummy::Application.routes.draw do
   restafarian_routes
 
   with_options only: %i<index show create update destroy> do |r|
-    r.resource  :singleton do
+    r.resource  :widget do
       resources :lols
     end
     r.resources :bank_accounts

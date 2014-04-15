@@ -27,7 +27,7 @@ describe Restafarian do
           body = JSON.parse(last_response.body)
 
           children = {
-            "singleton" => "http://example.org/singleton",
+            "widget" => "http://example.org/widget",
             "bank_accounts"=>"http://example.org/bank_accounts",
             "charges"=>"http://example.org/charges"
           }
@@ -41,7 +41,7 @@ describe Restafarian do
       context 'when the client makes a request with a Restafarian media type' do
         before do
           header 'Content-Type', 'application/vnd.restafarian.resource+js; version=1'
-          get    '/singleton'
+          get    '/widget'
         end
 
         it 'returns a 200 status code' do

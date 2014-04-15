@@ -7,7 +7,10 @@ gemspec
 
 gem 'rails',  github: 'stevegraham/rails', branch: 'new_router'
 gem 'pry'
+gem 'factory_girl_rails'
+
 gem 'uncle', path: '~/Code/uncle'
+
 
 # Declare any dependencies that are still in development here instead of in
 # your gemspec. These might include edge Rails or gems from your path or

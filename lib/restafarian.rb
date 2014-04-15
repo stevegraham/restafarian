@@ -1,5 +1,6 @@
 require 'uncle'
 require 'restafarian/request'
+require 'restafarian/type_hinter'
 
 module Restafarian
   class Engine < Rails::Engine

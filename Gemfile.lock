@@ -58,11 +58,16 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    arel (5.0.0)
+    arel (5.0.1.20140414130214)
     builder (3.2.2)
     coderay (1.1.0)
     diff-lcs (1.2.5)
     erubis (2.7.0)
+    factory_girl (4.4.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.4.1)
+      factory_girl (~> 4.4.0)
+      railties (>= 3.0.0)
     hike (1.2.3)
     i18n (0.6.9)
     json (1.8.1)
@@ -71,7 +76,7 @@ GEM
       treetop (~> 1.4.8)
     method_source (0.8.2)
     mime-types (1.25.1)
-    minitest (5.3.2)
+    minitest (5.3.3)
     multi_json (1.9.2)
     polyglot (0.3.4)
     pry (0.9.12.6)
@@ -118,6 +123,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  factory_girl_rails
   pry
   rack-test (~> 0.6.2)
   rails!
