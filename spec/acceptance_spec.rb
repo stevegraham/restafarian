@@ -4,14 +4,19 @@ describe Restafarian do
   describe 'HATEOAS' do
     describe 'entering the API at the root' do
       before do
-        header 'Content-Type', 'application/vnd.restafarian.resource+json; version=1'
+        header 'Content-Type', 'application/vnd.restafarian.resource+json; version=1; charset=utf-8'
       end
 
-      context 'when the client makes a request with a Restarian media type' do
+      context 'when the client makes a request with a Restafarian media type' do
         before { get '/' }
 
         it 'returns a 200 status code' do
           expect(last_response.status).to eq(200)
+        end
+
+        it 'returns the correct media type' do
+          expect(last_response.headers['Content-Type']).
+            to eq('application/vnd.restafarian.resource+json; version=1; charset=utf-8')
         end
 
         it 'returns JSON' do
@@ -22,7 +27,7 @@ describe Restafarian do
           body = JSON.parse(last_response.body)
 
           children = {
-            "users" => "http://example.org/user",
+            "singleton" => "http://example.org/singleton",
             "bank_accounts"=>"http://example.org/bank_accounts",
             "charges"=>"http://example.org/charges"
           }
@@ -32,11 +37,23 @@ describe Restafarian do
       end
     end
 
-    describe 'requesting a resource description' do
-      context 'when the client makes a request with a Restarian media type' do
-        it 'returns a 200 status code'
+    describe 'requesting a resource specification' do
+      context 'when the client makes a request with a Restafarian media type' do
+        before do
+          header 'Content-Type', 'application/vnd.restafarian.resource+js; version=1'
+          get    '/singleton'
+        end
+
+        it 'returns a 200 status code' do
+          expect(last_response.status).to eq(200)
+        end
+
         it 'returns JavaScript'
-        it 'lists permitted HTTP methods'
+
+        it 'lists permitted HTTP methods' do
+          expect(last_response.headers['Allow']).
+            to eq('POST, GET, PATCH, PUT, DELETE')
+          end
 
         describe 'the response body' do
           it 'has a localized name'

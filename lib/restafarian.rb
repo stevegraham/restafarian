@@ -1,4 +1,5 @@
 require 'uncle'
+require 'restafarian/request'
 
 module Restafarian
   class Engine < Rails::Engine
