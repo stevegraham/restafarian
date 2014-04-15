@@ -1,7 +1,8 @@
 module Restafarian
-  class TypeHinter < Struct.new(:object)
+  class TypeHinter < Struct.new(:klass)
     def hint(property)
-      infer_from_column(property)
+      infer_from_column(property) ||
+      infer_from_validators(property)
     end
 
     private
@@ -13,9 +14,14 @@ module Restafarian
       end
     end
 
+    def infer_from_validators(property)
+      validators = klass.validators_on(property)
+
+      :checkbox if validators.any? { |v| v.kind == :acceptance }
+    end
+
     def mapping
-      Hash[object.class.column_types.map { |k,v| [k, v.type] }].
-        with_indifferent_access
+      Hash[klass.column_types.map { |k,v| [k, v.type] }].with_indifferent_access
     end
   end
 end
