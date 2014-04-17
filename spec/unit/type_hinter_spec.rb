@@ -21,6 +21,16 @@ describe Restafarian::TypeHinter do
       describe 'for acceptance' do
         specify { expect(subject.hint :terms).to eq(:checkbox) }
       end
+
+      describe 'for a "struct" type from an inclusion validator' do
+        type = {
+          "Red"   => 'red',
+          "Green" => 'green',
+          "Blue"  => 'blue'
+        }
+
+        specify { expect(subject.hint :favourite_colour).to eq(type) }
+      end
     end
   end
 end
