@@ -4,7 +4,7 @@ describe Restafarian do
   describe 'HATEOAS' do
     describe 'entering the API at the root' do
       before do
-        header 'Content-Type', 'application/vnd.restafarian.resource+json; version=1; charset=utf-8'
+        header 'Accept', 'application/vnd.restafarian.resource+json; version=1; charset=utf-8'
       end
 
       context 'when the client makes a request with a Restafarian media type' do
@@ -40,15 +40,17 @@ describe Restafarian do
     describe 'requesting a resource specification' do
       context 'when the client makes a request with a Restafarian media type' do
         before do
-          header 'Content-Type', 'application/vnd.restafarian.resource+js; version=1'
+          header 'Accept', 'application/vnd.restafarian.resource+js; version=1'
           get    '/widget'
+
+          jsctx.eval(last_response.body)
         end
+
+        let(:jsctx) { V8::Context.new }
 
         it 'returns a 200 status code' do
           expect(last_response.status).to eq(200)
         end
-
-        it 'returns JavaScript'
 
         it 'lists permitted HTTP methods' do
           expect(last_response.headers['Allow']).
@@ -56,9 +58,11 @@ describe Restafarian do
           end
 
         describe 'the response body' do
-          it 'has a localized name'
+          it 'has a humanized name' do
+            expect(jsctx[:Resource].label).to eq('Widget')
+          end
 
-          describe 'the propery list' do
+          describe 'the property list' do
             it 'is a list of properties corresponding to that of the resource'
             it 'has a localized version of the name'
             it 'has a type hint'
