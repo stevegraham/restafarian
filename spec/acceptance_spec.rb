@@ -46,7 +46,9 @@ describe Restafarian do
           jsctx.eval(last_response.body)
         end
 
-        let(:jsctx) { V8::Context.new }
+        let(:jsctx)      { V8::Context.new }
+        let(:hinter)     { Restafarian::TypeHinter.new Widget }
+        let(:properties) { Widget.new.as_json.keys }
 
         it 'returns a 200 status code' do
           expect(last_response.status).to eq(200)
@@ -55,7 +57,7 @@ describe Restafarian do
         it 'lists permitted HTTP methods' do
           expect(last_response.headers['Allow']).
             to eq('POST, GET, PATCH, PUT, DELETE')
-          end
+        end
 
         describe 'the response body' do
           it 'has a humanized name' do
@@ -63,9 +65,35 @@ describe Restafarian do
           end
 
           describe 'the property list' do
-            it 'is a list of properties corresponding to that of the resource'
-            it 'has a localized version of the name'
-            it 'has a type hint'
+            it 'is a list of properties corresponding to that of the resource' do
+              expect(jsctx[:Resource].properties.keys).to eq(properties)
+            end
+            it 'has humanized versions of the property names' do
+              jsctx[:Resource].properties.each do |key, obj|
+                expect(obj.label.to_s).to eq(key.humanize)
+              end
+            end
+
+            it 'annotates each property with a type hint' do
+              annotated_props = Hash[(properties - ['favourite_colour']).
+                map { |p| [p, hinter.hint(p).to_s] }]
+
+              annotated_props.each do |key, type|
+                expect(jsctx[:Resource].properties[key].type).to eq(type)
+              end
+            end
+          end
+
+          describe 'for a "struct" type' do
+            it 'annotates each property with a type hint' do
+              values = %w<red green blue>
+              struct = jsctx[:Resource].properties.favourite_colour.type
+
+              struct.each_with_index do |(key, value), index|
+                expect(key).to eq(values[index].humanize)
+                expect(value).to eq(values[index])
+              end
+            end
           end
 
           describe 'the validation function' do

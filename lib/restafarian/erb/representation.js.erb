@@ -3,3 +3,7 @@
 var Resource = {};
 
 Resource.label = "<%= object_name %>";
+
+Resource.persisted = <%= object.persisted? %>;
+
+Resource.properties = <%= JSON.pretty_generate(object_typed_properties, indent: '  ') %>;

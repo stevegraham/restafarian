@@ -11,13 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140415222654) do
+ActiveRecord::Schema.define(version: 20140419212114) do
 
   create_table "widgets", force: true do |t|
     t.decimal  "decimal"
     t.float    "float"
     t.integer  "integer"
     t.datetime "datetime"
+    t.string   "email_address"
+    t.string   "telephone_number"
+    t.string   "phone_number"
+    t.string   "url"
+    t.string   "social_security_number"
   end
 
 end
