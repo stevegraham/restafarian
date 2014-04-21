@@ -13,6 +13,12 @@ module Restafarian
       @type_hinter ||= TypeHinter.new(object.class)
     end
 
+    def object_validators_on(property)
+      object.class.validators_on(property).reduce({}) do |memo, validator|
+        memo.merge validator.kind => validator.options
+      end
+    end
+
     def object_as_json
       object.as_json
     end
@@ -25,7 +31,8 @@ module Restafarian
       object_as_json.reduce({}) do |memo, (property, value)|
         memo.merge property => {
           label:      property.humanize,
-          type:       type_hinter.hint(property)
+          type:       type_hinter.hint(property),
+          validators: object_validators_on(property)
         }
       end
     end

@@ -47,6 +47,7 @@ describe Restafarian do
         end
 
         let(:jsctx)      { V8::Context.new }
+        let(:resource)   { jsctx[:Resource] }
         let(:hinter)     { Restafarian::TypeHinter.new Widget }
         let(:properties) { Widget.new.as_json.keys }
 
@@ -61,15 +62,15 @@ describe Restafarian do
 
         describe 'the response body' do
           it 'has a humanized name' do
-            expect(jsctx[:Resource].label).to eq('Widget')
+            expect(resource.label).to eq('Widget')
           end
 
           describe 'the property list' do
             it 'is a list of properties corresponding to that of the resource' do
-              expect(jsctx[:Resource].properties.keys).to eq(properties)
+              expect(resource.properties.keys).to eq(properties)
             end
             it 'has humanized versions of the property names' do
-              jsctx[:Resource].properties.each do |key, obj|
+              resource.properties.each do |key, obj|
                 expect(obj.label.to_s).to eq(key.humanize)
               end
             end
@@ -79,7 +80,29 @@ describe Restafarian do
                 map { |p| [p, hinter.hint(p).to_s] }]
 
               annotated_props.each do |key, type|
-                expect(jsctx[:Resource].properties[key].type).to eq(type)
+                expect(resource.properties[key].type).to eq(type)
+              end
+            end
+
+            it 'annotates each property with validator names and options' do
+              resource.properties.each do |key, obj|
+                validators = Widget.validators_on(key)
+
+                expect(obj.validators.keys).
+                  to eq(validators.map { |v| v.kind.to_s })
+
+                obj.validators.each_with_index do |(validator, options), index|
+                  validators[index].options.each do |key, value|
+                    # comparisons fail between ruby and v8 types
+                    subject = if options[key].kind_of?(V8::Array)
+                      options[key].to_a
+                    else
+                      options[key]
+                    end
+
+                    expect(value).to eq(subject)
+                  end
+                end
               end
             end
           end
@@ -87,7 +110,7 @@ describe Restafarian do
           describe 'for a "struct" type' do
             it 'annotates each property with a type hint' do
               values = %w<red green blue>
-              struct = jsctx[:Resource].properties.favourite_colour.type
+              struct = resource.properties.favourite_colour.type
 
               struct.each_with_index do |(key, value), index|
                 expect(key).to eq(values[index].humanize)
