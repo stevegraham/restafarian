@@ -16,7 +16,7 @@ describe 'JavaScript Validators:' do
     context 'with invalid input' do
       let(:representation) { { password: '' } }
 
-      specify { expect(errors[:password].to_a).to include('must not be blank') }
+      specify { expect(errors[:password].to_a).to include("can't be blank") }
     end
   end
 end

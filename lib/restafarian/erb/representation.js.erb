@@ -8,11 +8,14 @@ Resource.persisted = <%= object.persisted? %>;
 
 Resource.properties = <%= JSON.pretty_generate(object_typed_properties, indent: '  ') %>;
 
+Resource.errors = <%= JSON.pretty_generate(I18n.t('errors.messages'), indent: '  ') %>;
+
 Resource.validators = {
   "presence": function(property, options) {
-    var message = options.message || "must not be blank";
-    if(!this[property]) return message;
+    if(!this[property]) return 'blank';
   },
+
+  "absence": function(property, value) {},
 
   "length": function(property, options) {},
 
@@ -34,7 +37,9 @@ Resource.validate = function(representation) {
     for(var validator in this.properties[property].validators) {
       var options = this.properties[property].validators[validator];
       var error = this.validators[validator].call(representation, property, options);
-      if(error) errors[property].push(error);
+
+
+      if(error) errors[property].push(options.message || this.errors[error]);
     }
   }
 
