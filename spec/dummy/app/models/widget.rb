@@ -4,6 +4,7 @@ class Widget < ActiveRecord::Base
   validates :terms, acceptance: true
   validates :favourite_colour, inclusion: { in: %w<red green blue>}
   validates :password, presence: true
+  validates :doo_dad,  absence: true
 
   attr_accessor :cover_photo, :main_image, :chat_avatar, :profile_picture,
                 :resume_file, :password, :password_confirmation,
@@ -14,7 +15,7 @@ class Widget < ActiveRecord::Base
     super options.merge \
       methods: [:cover_photo, :main_image, :chat_avatar, :profile_picture,
                 :resume_file, :password, :password_confirmation,
-                :terms, :favourite_colour],
+                :terms, :favourite_colour, :doo_dad],
       except: [:id]
   end
 end

@@ -15,7 +15,9 @@ Resource.validators = {
     if(!this[property]) return 'blank';
   },
 
-  "absence": function(property, value) {},
+  "absence": function(property, value) {
+    if(this[property]) return 'present';
+  },
 
   "length": function(property, options) {},
 

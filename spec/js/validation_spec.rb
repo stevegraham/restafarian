@@ -19,4 +19,18 @@ describe 'JavaScript Validators:' do
       specify { expect(errors[:password].to_a).to include("can't be blank") }
     end
   end
+
+  describe 'absence' do
+    context 'with valid input' do
+      let(:representation) { { doo_dad: '' } }
+
+      specify { expect(errors[:doo_dad].to_a).to be_empty }
+    end
+
+    context 'with invalid input' do
+      let(:representation) { { doo_dad: 'hello' } }
+
+      specify { expect(errors[:doo_dad].to_a).to include('must be blank') }
+    end
+  end
 end
