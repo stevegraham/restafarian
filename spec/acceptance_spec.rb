@@ -118,16 +118,6 @@ describe Restafarian do
               end
             end
           end
-
-          describe 'the validation function' do
-            context 'when called with a valid representation' do
-              it 'returns an empty object'
-            end
-
-            context 'when called with an invalid representation' do
-              it 'returns an object containing pertinent error messages'
-            end
-          end
         end
       end
     end
