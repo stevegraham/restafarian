@@ -42,7 +42,13 @@ Resource.validators = {
       return ['confirmation', { attribute: property }];
   },
 
-  "numericality": function(property, options) {}
+  "numericality": function(property, options) {
+    var number = parseInt(this[property], 10);
+    if(!number) return ["not_a_number", {}];
+
+    if(options.only_integer && (String(number) != this[property]))
+      return ["not_an_integer", {}];
+  }
 }
 
 Resource.error = function(error, params, options) {

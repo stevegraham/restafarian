@@ -55,11 +55,11 @@ describe 'JavaScript Validators:' do
   describe 'acceptance' do
     context 'with valid input' do
       before  { representation['terms'] = true }
-      specify { expect(errors[:terms].to_a).to_not include("must be accepted") }
+      specify { expect(errors[:terms].to_a).to_not include('must be accepted') }
     end
 
     context 'with invalid input' do
-      specify { expect(errors[:terms].to_a).to include("must be accepted") }
+      specify { expect(errors[:terms].to_a).to include('must be accepted') }
     end
   end
 
@@ -67,12 +67,40 @@ describe 'JavaScript Validators:' do
     context 'with valid input' do
       before  { representation['favourite_colour'] = 'red' }
       specify { expect(errors[:favourite_colour].to_a).
-        to_not include("is not included in the list") }
+        to_not include('is not included in the list') }
     end
 
     context 'with invalid input' do
       specify { expect(errors[:favourite_colour].to_a).
-        to include("is not included in the list") }
+        to include('is not included in the list') }
+    end
+  end
+
+  describe 'numericality' do
+    context 'with valid input' do
+      before  { representation['decimal'] = '1' }
+      specify { expect(errors[:decimal].to_a).
+        to_not include('is not a number') }
+    end
+
+    context 'with invalid input' do
+      before  { representation['decimal'] = 'a' }
+      specify { expect(errors[:decimal].to_a).
+        to include('is not a number') }
+    end
+
+    context 'integer only' do
+      context 'with valid input' do
+        before  { representation['integer'] = '1' }
+        specify { expect(errors[:integer].to_a).
+          to_not include('is not a number', 'must be an integer') }
+      end
+
+      context 'with invalid input' do
+        before  { representation['integer'] = '3.0' }
+        specify { expect(errors[:integer].to_a).
+          to include('must be an integer') }
+      end
     end
   end
 end
