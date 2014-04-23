@@ -61,4 +61,15 @@ describe 'JavaScript Validators:' do
       specify { expect(errors[:terms].to_a).to include("must be accepted") }
     end
   end
+
+  describe 'inclusion' do
+    context 'with valid input' do
+      before  { representation['favourite_colour'] = 'red' }
+      specify { expect(errors[:favourite_colour].to_a).to be_empty }
+    end
+
+    context 'with invalid input' do
+      specify { expect(errors[:favourite_colour].to_a).to include("is not included in the list") }
+    end
+  end
 end

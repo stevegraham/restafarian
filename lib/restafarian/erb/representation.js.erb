@@ -11,24 +11,28 @@ Resource.properties = <%= JSON.pretty_generate(object_typed_properties, indent: 
 Resource.errors = <%= JSON.pretty_generate(I18n.t('errors.messages'), indent: '  ') %>;
 
 Resource.validators = {
-  "presence": function(options) {
-    if(!this) return ['blank', null];
+  "presence": function(property, options) {
+    if(!this[property]) return ['blank', null];
   },
 
-  "absence": function(options) {
-    if(this) return ['present', null];
+  "absence": function(property, options) {
+    if(this[property]) return ['present', null];
   },
 
-  "length": function(options) {
-    if(options.minimum && this.length < options.minimum) return ['too_short', 'minimum'];
-    if(options.maximum && this.length > options.maximum) return ['too_long',  'maximum'];
+  "length": function(property, options) {
+    property = this[property];
+
+    if(options.minimum && property.length < options.minimum) return ['too_short', 'minimum'];
+    if(options.maximum && property.length > options.maximum) return ['too_long',  'maximum'];
   },
 
-  "acceptance": function(options) {
-    if(!this) return ['accepted', null];
+  "acceptance": function(property, options) {
+    if(!this[property]) return ['accepted', null];
   },
 
-  "inclusion": function(property, options) {},
+  "inclusion": function(property, options) {
+    if(options['in'].indexOf(this[property]) < 0) return ['inclusion', null];
+  },
 
   "confirmation": function(property, options) {},
 
@@ -48,7 +52,7 @@ Resource.validate = function(representation) {
 
     for(var validator in this.properties[property].validators) {
       var options = this.properties[property].validators[validator];
-      var error = this.validators[validator].call(representation[property], options);
+      var error = this.validators[validator].call(representation, property, options);
 
 
       if(error) {
