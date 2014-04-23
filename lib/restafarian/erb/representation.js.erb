@@ -12,14 +12,19 @@ Resource.errors = <%= JSON.pretty_generate(I18n.t('errors.messages'), indent: ' 
 
 Resource.validators = {
   "presence": function(property, options) {
-    if(!this[property]) return 'blank';
+    if(!this[property]) return ['blank', null];
   },
 
   "absence": function(property, value) {
-    if(this[property]) return 'present';
+    if(this[property]) return ['present', null];
   },
 
-  "length": function(property, options) {},
+  "length": function(property, options) {
+    property = this[property];
+
+    if(options.minimum && property.length < options.minimum) return ['too_short', 'minimum'];
+    if(options.maximum && property.length > options.maximum) return ['too_long',  'maximum'];
+  },
 
   "acceptance": function(property, options) {},
 
@@ -28,6 +33,11 @@ Resource.validators = {
   "confirmation": function(property, options) {},
 
   "numericality": function(property, options) {}
+}
+
+Resource.error = function(error, key, options) {
+  var message = this.errors[error];
+  return message.replace("%{count}", options[key]);
 }
 
 Resource.validate = function(representation) {
@@ -41,7 +51,11 @@ Resource.validate = function(representation) {
       var error = this.validators[validator].call(representation, property, options);
 
 
-      if(error) errors[property].push(options.message || this.errors[error]);
+      if(error) {
+        error.push(options)
+        var message = options.message || this.error.apply(this, error);
+        errors[property].push(message);
+      }
     }
   }
 
