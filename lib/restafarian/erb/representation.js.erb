@@ -12,36 +12,44 @@ Resource.errors = <%= JSON.pretty_generate(I18n.t('errors.messages'), indent: ' 
 
 Resource.validators = {
   "presence": function(property, options) {
-    if(!this[property]) return ['blank', null];
+    if(!this[property]) return ['blank', {}];
   },
 
   "absence": function(property, options) {
-    if(this[property]) return ['present', null];
+    if(this[property]) return ['present', {}];
   },
 
   "length": function(property, options) {
     property = this[property];
 
-    if(options.minimum && property.length < options.minimum) return ['too_short', 'minimum'];
-    if(options.maximum && property.length > options.maximum) return ['too_long',  'maximum'];
+    if(options.minimum && property.length < options.minimum)
+      return ['too_short', { count: 'minimum' }];
+    if(options.maximum && property.length > options.maximum)
+      return ['too_long',  { count: 'maximum' }];
   },
 
   "acceptance": function(property, options) {
-    if(!this[property]) return ['accepted', null];
+    if(!this[property]) return ['accepted', {}];
   },
 
   "inclusion": function(property, options) {
-    if(options['in'].indexOf(this[property]) < 0) return ['inclusion', null];
+    if(options['in'].indexOf(this[property]) < 0)
+      return ['inclusion', {}];
   },
 
-  "confirmation": function(property, options) {},
+  "confirmation": function(property, options) {
+    if(this[property] != this[property + '_confirmation'])
+      return ['confirmation', { attribute: property }];
+  },
 
   "numericality": function(property, options) {}
 }
 
-Resource.error = function(error, key, options) {
+Resource.error = function(error, params, options) {
   var message = this.errors[error];
-  return message.replace("%{count}", options[key]);
+  return message.replace(/%{(\w+)}/, function(match, capture) {
+    return options[params[capture]];
+  });
 }
 
 Resource.validate = function(representation) {

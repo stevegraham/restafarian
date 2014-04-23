@@ -3,7 +3,7 @@ class Widget < ActiveRecord::Base
   validates :integer, numericality: { only_integer: true }
   validates :terms, acceptance: true
   validates :favourite_colour, inclusion: { in: %w<red green blue>}
-  validates :password, presence: true, length: { minimum: 8, maximum: 32 }
+  validates :password, presence: true, length: { minimum: 8, maximum: 32 }, confirmation: true
   validates :doo_dad,  absence: true
 
   attr_accessor :cover_photo, :main_image, :chat_avatar, :profile_picture,

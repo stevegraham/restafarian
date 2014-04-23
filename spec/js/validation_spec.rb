@@ -10,7 +10,7 @@ describe 'JavaScript Validators:' do
   describe 'presence' do
     context 'with valid input' do
       before  { representation['password'] = 'crappy_password_bro' }
-      specify { expect(errors[:password].to_a).to be_empty }
+      specify { expect(errors[:password].to_a).to_not include("can't be blank") }
     end
 
     context 'with invalid input' do
@@ -47,14 +47,15 @@ describe 'JavaScript Validators:' do
     context 'with valid input' do
       before  { representation['password'] = 'hello_world' }
 
-      specify { expect(errors[:password].to_a).to be_empty }
+      specify { expect(errors[:password].to_a).
+        to_not include('is too short (minimum is 8 characters)', 'is too long (maximum is 32 characters)') }
     end
   end
 
   describe 'acceptance' do
     context 'with valid input' do
       before  { representation['terms'] = true }
-      specify { expect(errors[:terms].to_a).to be_empty }
+      specify { expect(errors[:terms].to_a).to_not include("must be accepted") }
     end
 
     context 'with invalid input' do
@@ -65,11 +66,13 @@ describe 'JavaScript Validators:' do
   describe 'inclusion' do
     context 'with valid input' do
       before  { representation['favourite_colour'] = 'red' }
-      specify { expect(errors[:favourite_colour].to_a).to be_empty }
+      specify { expect(errors[:favourite_colour].to_a).
+        to_not include("is not included in the list") }
     end
 
     context 'with invalid input' do
-      specify { expect(errors[:favourite_colour].to_a).to include("is not included in the list") }
+      specify { expect(errors[:favourite_colour].to_a).
+        to include("is not included in the list") }
     end
   end
 end
