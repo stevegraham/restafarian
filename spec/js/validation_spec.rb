@@ -50,4 +50,15 @@ describe 'JavaScript Validators:' do
       specify { expect(errors[:password].to_a).to be_empty }
     end
   end
+
+  describe 'acceptance' do
+    context 'with valid input' do
+      before  { representation['terms'] = true }
+      specify { expect(errors[:terms].to_a).to be_empty }
+    end
+
+    context 'with invalid input' do
+      specify { expect(errors[:terms].to_a).to include("must be accepted") }
+    end
+  end
 end
