@@ -59,19 +59,18 @@ Resource.error = function(error, params, options) {
 }
 
 Resource.validate = function(representation) {
-  var errors = {};
+  var errors = {}, property, validator, options, error, message;
 
-  for(var property in this.properties) {
+  for(property in this.properties) {
     errors[property] = [];
 
-    for(var validator in this.properties[property].validators) {
-      var options = this.properties[property].validators[validator];
-      var error = this.validators[validator].call(representation, property, options);
-
+    for(validator in this.properties[property].validators) {
+      options = this.properties[property].validators[validator];
+      error = this.validators[validator].call(representation, property, options);
 
       if(error) {
         error.push(options)
-        var message = options.message || this.error.apply(this, error);
+        message = options.message || this.error.apply(this, error);
         errors[property].push(message);
       }
     }
