@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/stevegraham/restafarian"
   s.summary     = "A tool for implementing real REST HTTP APIs."
   s.description = "Expose fully RESTful HTTP APIs including code-on-demand " +
-    "so client can intelligent present most appropriate UI element for each " +
-    "property & perform arbitrary, non-authorative, client-side validations " +
+    "so the client can intelligently present the most appropriate UI element for each " +
+    "property & perform arbitrary, non-authoritative, client-side validations " +
     "before submitting data to the API server."
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
