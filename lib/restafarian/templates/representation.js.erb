@@ -1,0 +1,37 @@
+"use strict";
+
+var Resource = {
+  label: "<%= object_name %>",
+  persisted: <%= object.persisted? %>,
+  properties: <%= ActiveSupport::JSON.encode(object_typed_properties) %>,
+  errors: <%= ActiveSupport::JSON.encode(I18n.t('errors.messages')) %>,
+  validators: { <%= validators %>  },
+  error: function(error, params, options) {
+    var message = this.errors[error];
+    return message.replace(/%{(\w+)}/, function(match, capture) {
+      return options[params[capture]];
+    });
+  },
+  validate: function(representation) {
+    var errors = {};
+
+    for(var property in this.properties) {
+      errors[property] = [];
+
+      for(var validator in this.properties[property].validators) {
+        if(!this.validators[validator]) continue;
+
+        var options = this.properties[property].validators[validator];
+        var error   = this.validators[validator].call(representation, property, options);
+
+        if(error) {
+          error.push(options);
+          var message = options.message || this.error.apply(this, error);
+          errors[property].push(message);
+        }
+      }
+    }
+
+    return errors;
+  }
+};

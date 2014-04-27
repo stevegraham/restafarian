@@ -1,0 +1,50 @@
+presence: |
+  function(property, options) {
+    if(!this[property]) return ['blank', {}];
+  }
+absence: |
+  function(property, options) {
+    if(this[property]) return ['present', {}];
+  }
+length: |
+  function(property, options) {
+    property = this[property];
+
+    if(options.minimum && property.length < options.minimum)
+      return ['too_short', { count: 'minimum' }];
+    if(options.maximum && property.length > options.maximum)
+      return ['too_long',  { count: 'maximum' }];
+  }
+acceptance: |
+  function(property, options) {
+    if(!this[property]) return ['accepted', {}];
+  }
+inclusion: |
+  function(property, options) {
+    if(options['in'].indexOf(this[property]) < 0)
+      return ['inclusion', {}];
+  }
+confirmation: |
+  function(property, options) {
+    if(this[property] != this[property + '_confirmation'])
+      return ['confirmation', { attribute: property }];
+  }
+numericality: |
+  function(property, options) {
+    var number = parseInt(this[property], 10);
+    if(!number) return ['not_a_number', {}];
+
+    if(options.only_integer && (String(number) != this[property]))
+      return ['not_an_integer', {}];
+  }
+exclusion: |
+  function(property, options) {
+    if(options['in'].indexOf(this[property]) > -1)
+      return ['exclusion', {}];
+  }
+format: |
+  function(property, options) {
+    var re = new RegExp(options.with);
+
+    if(!this[property].match(re)) return ['invalid', {}];
+  }

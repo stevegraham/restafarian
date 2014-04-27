@@ -1,13 +1,20 @@
 module Restafarian
   class JavascriptRenderer < Struct.new(:object)
     TEMPLATE = File.read \
-      File.join(Engine.root, 'lib/restafarian/erb/representation.js.erb')
+      File.join(Engine.root, 'lib/restafarian/templates/representation.js.erb')
+    VALIDATORS = YAML.load \
+      File.read(File.join(Engine.root, 'lib/restafarian/templates/validators.yml'))
 
     def render
-      ERB.new(TEMPLATE, $SAFE, '>').result(binding)
+      ERB.new(TEMPLATE, $SAFE, '>').result(binding).
+        each_line.map(&:strip).join
     end
 
     private
+
+    def validators
+      VALIDATORS.map { |k,v| "#{k}: #{v.chomp}" }.join ","
+    end
 
     def type_hinter
       @type_hinter ||= TypeHinter.new(object.class)
