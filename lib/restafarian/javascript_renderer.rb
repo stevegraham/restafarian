@@ -15,7 +15,8 @@ module Restafarian
 
     def object_validators_on(property)
       object.class.validators_on(property).reduce({}) do |memo, validator|
-        memo.merge validator.kind => validator.options
+        options = process_options(validator.options)
+        memo.merge validator.kind => options
       end
     end
 
@@ -35,6 +36,19 @@ module Restafarian
           validators: object_validators_on(property)
         }
       end
+    end
+
+    def process_options(options)
+      opts = options.map do |k,v|
+        case v
+        when Regexp
+          v = v.source
+        end
+
+        [k, v]
+      end
+
+      Hash[opts]
     end
   end
 end

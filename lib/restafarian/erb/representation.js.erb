@@ -53,7 +53,13 @@ Resource.validators = {
   "exclusion": function(property, options) {
     if(options['in'].indexOf(this[property]) > -1)
       return ['exclusion', {}];
-  }
+  },
+
+  "format":  function(property, options) {
+    var re = new RegExp(options.with);
+
+    if(!this[property].match(re)) return ['invalid', {}];
+  },
 }
 
 Resource.error = function(error, params, options) {

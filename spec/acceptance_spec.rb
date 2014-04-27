@@ -100,7 +100,11 @@ describe Restafarian do
                       options[key]
                     end
 
-                    expect(value).to eq(subject)
+                    if value.is_a? Regexp
+                      expect(value.source).to eq(subject)
+                    else
+                      expect(value).to eq(subject)
+                    end
                   end
                 end
               end

@@ -117,4 +117,19 @@ describe 'JavaScript Validators:' do
         to include('is reserved') }
     end
   end
+
+  describe 'format' do
+    context 'with valid input' do
+      before  { representation['email'] = 'stevie@example.com' }
+      specify { expect(errors[:email].to_a).
+        to_not include('is invalid') }
+    end
+
+
+    context 'with invalid input' do
+      before  { representation['email'] = 'stevie' }
+      specify { expect(errors[:email].to_a).
+        to include('is invalid') }
+    end
+  end
 end
