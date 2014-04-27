@@ -1,37 +1,39 @@
-"use strict";
-
-var Resource = {
-  label: "<%= object_name %>",
-  persisted: <%= object.persisted? %>,
-  properties: <%= ActiveSupport::JSON.encode(object_typed_properties) %>,
-  errors: <%= ActiveSupport::JSON.encode(I18n.t('errors.messages')) %>,
-  validators: { <%= validators %>  },
-  error: function(error, params, options) {
-    var message = this.errors[error];
+(function() {
+  "use strict";
+  var persisted = <%= object.persisted? %>;
+  var errors = <%= ActiveSupport::JSON.encode(I18n.t('errors.messages')) %>;
+  var validators = { <%= validators %>  };
+  var errorFormatter = function(error, params, options) {
+    var message = errors[error];
     return message.replace(/%{(\w+)}/, function(match, capture) {
       return options[params[capture]];
     });
-  },
-  validate: function(representation) {
-    var errors = {};
+  };
+  var resource = {
+    label: "<%= object_name %>",
+    properties: <%= ActiveSupport::JSON.encode(object_typed_properties) %>,
+    validate: function(representation) {
+      var errors = {};
 
-    for(var property in this.properties) {
-      errors[property] = [];
+      for(var property in this.properties) {
+        errors[property] = [];
 
-      for(var validator in this.properties[property].validators) {
-        if(!this.validators[validator]) continue;
+        for(var validator in this.properties[property].validators) {
+          if(!validators[validator]) continue;
 
-        var options = this.properties[property].validators[validator];
-        var error   = this.validators[validator].call(representation, property, options);
+          var options = this.properties[property].validators[validator];
+          var error   = validators[validator].call(representation, property, options);
 
-        if(error) {
-          error.push(options);
-          var message = options.message || this.error.apply(this, error);
-          errors[property].push(message);
+          if(error) {
+            error.push(options);
+            var message = options.message || errorFormatter.apply(this, error);
+            errors[property].push(message);
+          }
         }
       }
-    }
 
-    return errors;
-  }
-};
+      return errors;
+    }
+  };
+  return resource;
+})();

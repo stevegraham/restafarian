@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe 'JavaScript Validators:' do
   let(:renderer)       { Restafarian::JavascriptRenderer.new Widget.new }
-  let(:context)        { V8::Context.new.tap { |c| c.eval(renderer.render) } }
-  let(:resource)       { context[:Resource] }
+  let(:context)        { V8::Context.new }
+  let(:resource)       { context.eval(renderer.render) }
   let(:errors)         { resource[:validate].methodcall(resource,representation) }
   let(:representation) { Hash[Widget.new.as_json.map { |k,v| [k, ''] }] }
 

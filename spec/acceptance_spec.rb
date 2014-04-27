@@ -42,12 +42,10 @@ describe Restafarian do
         before do
           header 'Accept', 'application/vnd.restafarian.resource+js; version=1'
           get    '/widget'
-
-          jsctx.eval(last_response.body)
         end
 
         let(:jsctx)      { V8::Context.new }
-        let(:resource)   { jsctx[:Resource] }
+        let(:resource)   { jsctx.eval(last_response.body) }
         let(:hinter)     { Restafarian::TypeHinter.new Widget }
         let(:properties) { Widget.new.as_json.keys }
 
