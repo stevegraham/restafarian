@@ -5,17 +5,18 @@ class Widget < ActiveRecord::Base
   validates :favourite_colour, inclusion: { in: %w<red green blue>}
   validates :password, presence: true, length: { minimum: 8, maximum: 32 }, confirmation: true
   validates :doo_dad,  absence: true
+  validates :username, exclusion: { in: ['admin', 'root'] }
 
   attr_accessor :cover_photo, :main_image, :chat_avatar, :profile_picture,
                 :resume_file, :password, :password_confirmation,
                 :telephone_number, :phone_number, :lucky_number,
-                :favourite_colour, :doo_dad
+                :favourite_colour, :doo_dad, :username
 
   def as_json(options={})
     super options.merge \
       methods: [:cover_photo, :main_image, :chat_avatar, :profile_picture,
                 :resume_file, :password, :password_confirmation,
-                :terms, :favourite_colour, :doo_dad],
+                :terms, :favourite_colour, :doo_dad, :username],
       except: [:id]
   end
 end

@@ -6,9 +6,9 @@ Resource.label = "<%= object_name %>";
 
 Resource.persisted = <%= object.persisted? %>;
 
-Resource.properties = <%= JSON.pretty_generate(object_typed_properties, indent: '  ') %>;
+Resource.properties = <%= ActiveSupport::JSON.encode(object_typed_properties) %>;
 
-Resource.errors = <%= JSON.pretty_generate(I18n.t('errors.messages'), indent: '  ') %>;
+Resource.errors = <%= ActiveSupport::JSON.encode(I18n.t('errors.messages')) %>;
 
 Resource.validators = {
   "presence": function(property, options) {
@@ -48,6 +48,11 @@ Resource.validators = {
 
     if(options.only_integer && (String(number) != this[property]))
       return ["not_an_integer", {}];
+  },
+
+  "exclusion": function(property, options) {
+    if(options['in'].indexOf(this[property]) > -1)
+      return ['exclusion', {}];
   }
 }
 
@@ -65,9 +70,10 @@ Resource.validate = function(representation) {
     errors[property] = [];
 
     for(var validator in this.properties[property].validators) {
-      var options = this.properties[property].validators[validator];
-      var error = this.validators[validator].call(representation, property, options);
+      if(!this.validators[validator]) continue;
 
+      var options = this.properties[property].validators[validator];
+      var error   = this.validators[validator].call(representation, property, options);
 
       if(error) {
         error.push(options)

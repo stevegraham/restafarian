@@ -103,4 +103,18 @@ describe 'JavaScript Validators:' do
       end
     end
   end
+
+  describe 'exclusion' do
+    context 'with valid input' do
+      before  { representation['username'] = 'stevie' }
+      specify { expect(errors[:username].to_a).
+        to_not include('is reserved') }
+    end
+
+    context 'with invalid input' do
+      before  { representation['username'] = 'admin' }
+      specify { expect(errors[:username].to_a).
+        to include('is reserved') }
+    end
+  end
 end
