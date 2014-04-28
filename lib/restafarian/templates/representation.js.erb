@@ -1,7 +1,7 @@
 (function() {
   "use strict";
-  var persisted = <%= object.persisted? %>;
-  var errors = <%= ActiveSupport::JSON.encode(I18n.t('errors.messages')) %>;
+  var persisted  = <%= object.persisted? %>;
+  var errors     = <%= error_messages %>;
   var validators = { <%= validators %>  };
   var errorFormatter = function(error, params, options) {
     var message = errors[error];
@@ -11,7 +11,7 @@
   };
   var resource = {
     label: "<%= object_name %>",
-    properties: <%= ActiveSupport::JSON.encode(object_typed_properties) %>,
+    properties: <%= typed_properties %>,
     validate: function(representation) {
       var errors = {};
 

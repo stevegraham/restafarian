@@ -12,8 +12,17 @@ module Restafarian
 
     private
 
+    def typed_properties
+      ActiveSupport::JSON.encode(object_typed_properties)
+    end
+
+    def error_messages
+      ActiveSupport::JSON.encode(I18n.t('errors.messages'))
+    end
+
     def validators
-      VALIDATORS.map { |k,v| "#{k}: #{v.chomp}" }.join ","
+      validators = object.class.validators.map { |v| v.kind.to_s }.uniq
+      VALIDATORS.slice(*validators).map { |k,v| "#{k}:#{v.chomp}" }.join ","
     end
 
     def type_hinter
