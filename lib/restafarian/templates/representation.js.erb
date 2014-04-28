@@ -1,6 +1,5 @@
 (function() {
   "use strict";
-  var persisted  = <%= object.persisted? %>;
   var errors     = <%= error_messages %>;
   var validators = { <%= validators %>  };
   var errorFormatter = function(error, params, options) {

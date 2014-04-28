@@ -1,13 +1,11 @@
 module Restafarian
   class JavascriptRenderer < Struct.new(:object)
-    TEMPLATE = File.read \
-      File.join(Engine.root, 'lib/restafarian/templates/representation.js.erb')
-    VALIDATORS = YAML.load \
-      File.read(File.join(Engine.root, 'lib/restafarian/templates/validators.yml'))
+    TEMPLATE_PATH = Engine.root + 'lib/restafarian/templates'
+    JS_TEMPLATE   = File.read(TEMPLATE_PATH + 'representation.js.erb')
+    VALIDATORS    = YAML.load(File.read(TEMPLATE_PATH + 'validators.yml'))
 
     def render
-      ERB.new(TEMPLATE, $SAFE, '>').result(binding).
-        each_line.map(&:strip).join
+      ERB.new(JS_TEMPLATE, $SAFE, '>').result(binding).each_line.map(&:strip).join
     end
 
     private
@@ -21,8 +19,20 @@ module Restafarian
     end
 
     def validators
-      validators = object.class.validators.map { |v| v.kind.to_s }.uniq
-      VALIDATORS.slice(*validators).map { |k,v| "#{k}:#{v.chomp}" }.join ","
+      VALIDATORS.slice(*pertinent_validators).
+        map { |k,v| "#{k}:#{v.chomp}" }.join ","
+    end
+
+    def pertinent_validators
+      names = object_as_json.keys.inject([]) do |memo, key|
+        validators = object.class.validators_on(key).reject do |validator|
+          validator.options[:on] == (object.new_record? ? :create : :update)
+        end
+
+        memo.push *validators.map(&:kind)
+      end
+
+      names.uniq
     end
 
     def type_hinter
