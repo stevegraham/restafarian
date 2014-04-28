@@ -3,6 +3,12 @@ module Restafarian
     TEMPLATE_PATH = Engine.root + 'lib/restafarian/templates'
     JS_TEMPLATE   = File.read(TEMPLATE_PATH + 'representation.js.erb')
     VALIDATORS    = YAML.load(File.read(TEMPLATE_PATH + 'validators.yml'))
+    ERROR_MAPPING = {
+      presence: [:blank], absence: [:present], length: %i<too_short too_long>,
+      acceptance: [:accepted], inclusion: [:inclusion],
+      confirmation: [:confirmation], numericality: %i<not_a_number not_an_integer>,
+      exclusion: [:exclusion], format:[:invalid]
+    }
 
     def render
       ERB.new(JS_TEMPLATE, $SAFE, '>').result(binding).each_line.map(&:strip).join
@@ -14,13 +20,13 @@ module Restafarian
       ActiveSupport::JSON.encode(object_typed_properties)
     end
 
-    def error_messages
-      ActiveSupport::JSON.encode(I18n.t('errors.messages'))
-    end
-
     def validators
       VALIDATORS.slice(*pertinent_validators).
-        map { |k,v| "#{k}:#{v.chomp}" }.join ","
+        map { |k,v| "#{k}:#{(v % errors_for(k))}" }.join ","
+    end
+
+    def errors_for(key)
+      ERROR_MAPPING[key].map { |k| I18n.t('errors.messages')[k] }
     end
 
     def pertinent_validators

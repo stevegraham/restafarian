@@ -1,11 +1,9 @@
 (function() {
   "use strict";
-  var errors     = <%= error_messages %>;
   var validators = { <%= validators %>  };
-  var errorFormatter = function(error, params, options) {
-    var message = errors[error];
+  var fmt = function(message, params) {
     return message.replace(/%{(\w+)}/, function(match, capture) {
-      return options[params[capture]];
+      return params[capture];
     });
   };
   var resource = {
@@ -23,11 +21,7 @@
           var options = this.properties[property].validators[validator];
           var error   = validators[validator].call(representation, property, options);
 
-          if(error) {
-            error.push(options);
-            var message = options.message || errorFormatter.apply(this, error);
-            errors[property].push(message);
-          }
+          if(error) errors[property].push(error);
         }
       }
 

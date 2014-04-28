@@ -1,50 +1,113 @@
 :presence: |
   function(property, options) {
-    if(!this[property]) return ['blank', {}];
+    if(!this[property]) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :absence: |
   function(property, options) {
-    if(this[property]) return ['present', {}];
+    if(this[property]) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :length: |
   function(property, options) {
     property = this[property];
 
-    if(options.minimum && property.length < options.minimum)
-      return ['too_short', { count: 'minimum' }];
-    if(options.maximum && property.length > options.maximum)
-      return ['too_long',  { count: 'maximum' }];
+    if(options.minimum && property.length < options.minimum) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource,
+        count: options.minimum
+      });
+    }
+
+    if(options.maximum && property.length > options.maximum) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource,
+        count: options.maximum
+      });
+    }
   }
 :acceptance: |
   function(property, options) {
-    if(!this[property]) return ['accepted', {}];
+    if(!this[property]) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :inclusion: |
   function(property, options) {
-    if(options['in'].indexOf(this[property]) < 0)
-      return ['inclusion', {}];
+    if(options['in'].indexOf(this[property]) < 0) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :confirmation: |
   function(property, options) {
-    if(this[property] != this[property + '_confirmation'])
-      return ['confirmation', { attribute: property }];
+    if(this[property] != this[property + '_confirmation']) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :numericality: |
   function(property, options) {
     var number = parseInt(this[property], 10);
-    if(!number) return ['not_a_number', {}];
+    if(!number) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
 
-    if(options.only_integer && (String(number) != this[property]))
-      return ['not_an_integer', {}];
+    if(options.only_integer && (String(number) != this[property])) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :exclusion: |
   function(property, options) {
-    if(options['in'].indexOf(this[property]) > -1)
-      return ['exclusion', {}];
+    if(options['in'].indexOf(this[property]) > -1) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }
 :format: |
   function(property, options) {
     var re = new RegExp(options.with);
 
-    if(!this[property].match(re)) return ['invalid', {}];
+    if(!this[property].match(re)) {
+      return fmt("%s", {
+        attribute: property,
+        value: this[property],
+        model: this.resource
+      });
+    }
   }

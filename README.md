@@ -119,75 +119,111 @@ Vary: Content-Type
 
 (function() {
     "use strict";
-    var persisted = false;
-    var errors = {
-        "inclusion": "is not included in the list",
-        "exclusion": "is reserved",
-        "invalid": "is invalid",
-        "confirmation": "doesn't match %{attribute}",
-        "accepted": "must be accepted",
-        "empty": "can't be empty",
-        "blank": "can't be blank",
-        "present": "must be blank",
-        "too_long": "is too long (maximum is %{count} characters)",
-        "too_short": "is too short (minimum is %{count} characters)",
-        "wrong_length": "is the wrong length (should be %{count} characters)",
-        "not_a_number": "is not a number",
-        "not_an_integer": "must be an integer",
-        "greater_than": "must be greater than %{count}",
-        "greater_than_or_equal_to": "must be greater than or equal to %{count}",
-        "equal_to": "must be equal to %{count}",
-        "less_than": "must be less than %{count}",
-        "less_than_or_equal_to": "must be less than or equal to %{count}",
-        "other_than": "must be other than %{count}",
-        "odd": "must be odd",
-        "even": "must be even",
-        "taken": "has already been taken"
-    };
     var validators = {
-        presence: function(property, options) {
-            if (!this[property]) return ['blank', {}];
+        numericality: function(property, options) {
+            var number = parseInt(this[property], 10);
+            if (!number) {
+                return fmt("is not a number", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
+            if (options.only_integer && (String(number) != this[property])) {
+                return fmt("must be an integer", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         },
-        absence: function(property, options) {
-            if (this[property]) return ['present', {}];
+        presence: function(property, options) {
+            if (!this[property]) {
+                return fmt("can't be blank", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         },
         length: function(property, options) {
             property = this[property];
-            if (options.minimum && property.length < options.minimum) return ['too_short', {
-                count: 'minimum'
-            }];
-            if (options.maximum && property.length > options.maximum) return ['too_long', {
-                count: 'maximum'
-            }];
-        },
-        acceptance: function(property, options) {
-            if (!this[property]) return ['accepted', {}];
-        },
-        inclusion: function(property, options) {
-            if (options['in'].indexOf(this[property]) < 0) return ['inclusion', {}];
+            if (options.minimum && property.length < options.minimum) {
+                return fmt("is too short (minimum is %{count} characters)", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource,
+                    count: options.minimum
+                });
+            }
+            if (options.maximum && property.length > options.maximum) {
+                return fmt("is too long (maximum is %{count} characters)", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource,
+                    count: options.maximum
+                });
+            }
         },
         confirmation: function(property, options) {
-            if (this[property] != this[property + '_confirmation']) return ['confirmation', {
-                attribute: property
-            }];
+            if (this[property] != this[property + '_confirmation']) {
+                return fmt("doesn't match %{attribute}", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         },
-        numericality: function(property, options) {
-            var number = parseInt(this[property], 10);
-            if (!number) return ['not_a_number', {}];
-            if (options.only_integer && (String(number) != this[property])) return ['not_an_integer', {}];
+        acceptance: function(property, options) {
+            if (!this[property]) {
+                return fmt("must be accepted", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
+        },
+        inclusion: function(property, options) {
+            if (options['in'].indexOf(this[property]) < 0) {
+                return fmt("is not included in the list", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
+        },
+        absence: function(property, options) {
+            if (this[property]) {
+                return fmt("must be blank", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         },
         exclusion: function(property, options) {
-            if (options['in'].indexOf(this[property]) > -1) return ['exclusion', {}];
+            if (options['in'].indexOf(this[property]) > -1) {
+                return fmt("is reserved", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         },
         format: function(property, options) {
             var re = new RegExp(options.with);
-            if (!this[property].match(re)) return ['invalid', {}];
+            if (!this[property].match(re)) {
+                return fmt("is invalid", {
+                    attribute: property,
+                    value: this[property],
+                    model: this.resource
+                });
+            }
         }
     };
-    var errorFormatter = function(error, params, options) {
-        var message = errors[error];
+    var fmt = function(message, params) {
         return message.replace(/%{(\w+)}/, function(match, capture) {
-            return options[params[capture]];
+            return params[capture];
         });
     };
     var resource = {
@@ -345,11 +381,7 @@ Vary: Content-Type
                     if (!validators[validator]) continue;
                     var options = this.properties[property].validators[validator];
                     var error = validators[validator].call(representation, property, options);
-                    if (error) {
-                        error.push(options);
-                        var message = options.message || errorFormatter.apply(this, error);
-                        errors[property].push(message);
-                    }
+                    if (error) errors[property].push(error);
                 }
             }
             return errors;
