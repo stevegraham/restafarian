@@ -1,21 +1,13 @@
 :presence: |
   function(property, options) {
     if(!this[property]) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :absence: |
   function(property, options) {
     if(this[property]) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :length: |
@@ -23,80 +15,46 @@
     property = this[property];
 
     if(options.minimum && property.length < options.minimum) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource,
-        count: options.minimum
-      });
+      return ["%s", { count: options.minimum }];
     }
 
     if(options.maximum && property.length > options.maximum) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource,
-        count: options.maximum
-      });
+      return ["%s", { count: options.maximum }];
     }
   }
 :acceptance: |
   function(property, options) {
     if(!this[property]) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :inclusion: |
   function(property, options) {
     if(options['in'].indexOf(this[property]) < 0) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :confirmation: |
   function(property, options) {
     if(this[property] != this[property + '_confirmation']) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :numericality: |
   function(property, options) {
     var number = parseInt(this[property], 10);
     if(!number) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
 
     if(options.only_integer && (String(number) != this[property])) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :exclusion: |
   function(property, options) {
     if(options['in'].indexOf(this[property]) > -1) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }
 :format: |
@@ -104,10 +62,6 @@
     var re = new RegExp(options.with);
 
     if(!this[property].match(re)) {
-      return fmt("%s", {
-        attribute: property,
-        value: this[property],
-        model: this.resource
-      });
+      return ["%s", {}];
     }
   }

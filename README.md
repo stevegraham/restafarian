@@ -81,7 +81,7 @@ The client asks the server to describe the widget resource using the Restafarian
 Javascript media type.
 
 ```
-GET /widget HTTP/1.1
+GET /user HTTP/1.1
 Host: api.example.com
 Accept: application/vnd.restafarian+javascript; version=1
 ```
@@ -120,207 +120,54 @@ Vary: Content-Type
 (function() {
     "use strict";
     var validators = {
-        numericality: function(property, options) {
-            var number = parseInt(this[property], 10);
-            if (!number) {
-                return fmt("is not a number", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-            if (options.only_integer && (String(number) != this[property])) {
-                return fmt("must be an integer", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
         presence: function(property, options) {
             if (!this[property]) {
-                return fmt("can't be blank", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
-        length: function(property, options) {
-            property = this[property];
-            if (options.minimum && property.length < options.minimum) {
-                return fmt("is too short (minimum is %{count} characters)", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource,
-                    count: options.minimum
-                });
-            }
-            if (options.maximum && property.length > options.maximum) {
-                return fmt("is too long (maximum is %{count} characters)", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource,
-                    count: options.maximum
-                });
+                return ["can't be blank", {}];
             }
         },
         confirmation: function(property, options) {
             if (this[property] != this[property + '_confirmation']) {
-                return fmt("doesn't match %{attribute}", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
+                return ["doesn't match %{attribute}", {}];
             }
         },
         acceptance: function(property, options) {
             if (!this[property]) {
-                return fmt("must be accepted", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
-        inclusion: function(property, options) {
-            if (options['in'].indexOf(this[property]) < 0) {
-                return fmt("is not included in the list", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
-        absence: function(property, options) {
-            if (this[property]) {
-                return fmt("must be blank", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
-        exclusion: function(property, options) {
-            if (options['in'].indexOf(this[property]) > -1) {
-                return fmt("is reserved", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
-            }
-        },
-        format: function(property, options) {
-            var re = new RegExp(options.with);
-            if (!this[property].match(re)) {
-                return fmt("is invalid", {
-                    attribute: property,
-                    value: this[property],
-                    model: this.resource
-                });
+                return ["must be accepted", {}];
             }
         }
     };
-    var fmt = function(message, params) {
-        return message.replace(/%{(\w+)}/, function(match, capture) {
-            return params[capture];
+    var fmt = function(error) {
+        return error[0].replace(/%{(\w+)}/, function(match, capture) {
+            return error[1][capture];
         });
     };
     var resource = {
-        label: "Widget",
+        label: "User",
         properties: {
-            "decimal": {
-                "label": "Decimal",
-                "type": "number",
+            "name": {
+                "label": "Name",
+                "type": "text",
                 "validators": {
-                    "numericality": {
-                        "greater_than": 100
-                    }
+                    "presence": {}
                 }
-            },
-            "float": {
-                "label": "Float",
-                "type": "number",
-                "validators": {}
-            },
-            "integer": {
-                "label": "Integer",
-                "type": "number",
-                "validators": {
-                    "numericality": {
-                        "only_integer": true
-                    }
-                }
-            },
-            "datetime": {
-                "label": "Datetime",
-                "type": "datetime",
-                "validators": {}
             },
             "email_address": {
                 "label": "Email address",
                 "type": "email",
-                "validators": {}
-            },
-            "telephone_number": {
-                "label": "Telephone number",
-                "type": "tel",
-                "validators": {}
-            },
-            "phone_number": {
-                "label": "Phone number",
-                "type": "tel",
-                "validators": {}
-            },
-            "url": {
-                "label": "Url",
-                "type": "url",
-                "validators": {}
-            },
-            "social_security_number": {
-                "label": "Social security number",
-                "type": "number",
-                "validators": {}
-            },
-            "cover_photo": {
-                "label": "Cover photo",
-                "type": "image",
-                "validators": {}
-            },
-            "main_image": {
-                "label": "Main image",
-                "type": "image",
-                "validators": {}
-            },
-            "chat_avatar": {
-                "label": "Chat avatar",
-                "type": "image",
-                "validators": {}
-            },
-            "profile_picture": {
-                "label": "Profile picture",
-                "type": "image",
-                "validators": {}
-            },
-            "resume_file": {
-                "label": "Resume file",
-                "type": "file",
-                "validators": {}
+                "validators": {
+                    "presence": {}
+                }
             },
             "password": {
                 "label": "Password",
                 "type": "password",
                 "validators": {
                     "presence": {},
-                    "length": {
-                        "minimum": 8,
-                        "maximum": 32
-                    },
                     "confirmation": {}
                 }
             },
-            "password_confirmation": {
-                "label": "Password confirmation",
+            "password_confirmations": {
+                "label": "Password confirmations",
                 "type": "password",
                 "validators": {}
             },
@@ -333,44 +180,6 @@ Vary: Content-Type
                         "accept": "1"
                     }
                 }
-            },
-            "favourite_colour": {
-                "label": "Favourite colour",
-                "type": {
-                    "Red": "red",
-                    "Green": "green",
-                    "Blue": "blue"
-                },
-                "validators": {
-                    "inclusion": {
-                        "in": ["red", "green", "blue"]
-                    }
-                }
-            },
-            "doo_dad": {
-                "label": "Doo dad",
-                "type": "text",
-                "validators": {
-                    "absence": {}
-                }
-            },
-            "username": {
-                "label": "Username",
-                "type": "text",
-                "validators": {
-                    "exclusion": {
-                        "in": ["admin", "root"]
-                    }
-                }
-            },
-            "email": {
-                "label": "Email",
-                "type": "email",
-                "validators": {
-                    "format": {
-                        "with": "\\w+@\\w+.com"
-                    }
-                }
             }
         },
         validate: function(representation) {
@@ -381,7 +190,15 @@ Vary: Content-Type
                     if (!validators[validator]) continue;
                     var options = this.properties[property].validators[validator];
                     var error = validators[validator].call(representation, property, options);
-                    if (error) errors[property].push(error);
+                    var defaults = {
+                        attribute: property,
+                        value: representation[property],
+                        model: this.label
+                    };
+                    if (error) {
+                        for (var key in defaults) error[1][key] = defaults[key];
+                        errors[property].push(fmt(error));
+                    }
                 }
             }
             return errors;

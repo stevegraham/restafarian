@@ -1,9 +1,9 @@
 (function() {
   "use strict";
   var validators = { <%= validators %>  };
-  var fmt = function(message, params) {
-    return message.replace(/%{(\w+)}/, function(match, capture) {
-      return params[capture];
+  var fmt = function(error) {
+    return error[0].replace(/%{(\w+)}/, function(match, capture) {
+      return error[1][capture];
     });
   };
   var resource = {
@@ -19,9 +19,18 @@
           if(!validators[validator]) continue;
 
           var options = this.properties[property].validators[validator];
-          var error   = validators[validator].call(representation, property, options);
+          var error = validators[validator].call(representation, property, options);
 
-          if(error) errors[property].push(error);
+          var defaults = {
+            attribute: property,
+            value: representation[property],
+            model: this.label
+          };
+
+          if(error) {
+            for(var key in defaults) error[1][key] = defaults[key];
+            errors[property].push(fmt(error));
+          }
         }
       }
 
