@@ -1,18 +1,31 @@
 # HATEOAS user signup example
 
 The entry point for the API may return a different representation depending on the
-request, e.g. valid user credentials supplied with basic auth
+request, e.g. valid user credentials supplied with basic auth.
 
-## For a unauthenticated user
+The response contains links for the client to follow. Links containing a title
+are intended for display to the user. Links without a title MUST NOT be
+displayed to the user.
+
+## For an unauthenticated user
 
 ```json
 {
+  "_curies": [
+    {
+      "name": "rel",
+      "href": "http://example.com/docs/rels/{rel}",
+      "templated": true
+    }
+  ],
   "_links": [
     {
       "title": "Signup",
-      "href": "/signup"
+      "href": "/signup",
+      "rel": ["rel:signup"]
     },
-    { "href": "/",
+    {
+      "href": "/",
       "rel": ["self"]
     }
   ]
@@ -23,16 +36,23 @@ The user instructs the client to follow the link to the signup resource.
 
 ```json
 {
+  "_curies": [
+    {
+      "name": "rel",
+      "href": "http://example.com/docs/rels/{rel}",
+      "templated": true
+    }
+  ],
   "_links": [
     {
-      "href": "/signup/validator",
-      "rel": ["validator"]
+      "href": "/signup/_validator",
+      "rel": ["rel:validator"],
+      "accept": "application/javascript"
     },
     { "href": "/",
       "rel": ["self"]
     }
   ],
-
   "_properties": {
     "name": {
       "label": "Name",
@@ -57,6 +77,10 @@ The user instructs the client to follow the link to the signup resource.
   }
 }
 ```
+
+An empty resource with a `_properties` property MUST be interpreted by the client
+as an instruction to create a resource, the client MUST render a UI to that
+effect.
 
 The response contains a link to code on demand to validate representations and
 the type annotated properties of a resource instance. The type annotations inform
@@ -151,4 +175,66 @@ that property is notionally valid.
     return errors;
   };
 })();
+```
+
+## Handling errors
+
+When the server rejects a representation submitted by the client the status
+code is 422 and errors are returned as an object on the `_errors` property of
+the response. The property name of the resource object corresponds to the
+property on the representation, the property value is an array of error strings
+pertaining to that property.
+
+```json
+{
+  "_errors": {
+    "name": ["is taken"],
+    "email_address": ["is invalid"],
+    "password_confirmation": ["does not match password"]
+  }
+}
+```
+
+### Handling a successful request
+
+When the server accepts a representation, a 2xx-3xx response code is returned.
+Examples include returning the current state of the representation, or
+redirection to a sub resource for further processing. In the case of user
+creation we want to return a 204 No Content so there is no application
+state forcing the client back to the entry point. The server sets an
+"Authorization" header in the response that is exactly the same as the header
+used by a client in a request, i.e. Base64 encoded user:pass. This header has
+the semantics of telling the client to use this token to authorise subsequent
+requests.
+
+## API entry as an authenticated user
+
+The client re-enters the API using the newly obtained authentication credentials
+and the representation is different, i.e. that of a registered user.
+
+```json
+{
+  "_links": [
+    {
+      "title": "Feed",
+      "href": "/feed"
+    },
+    {
+      "title": "Friends",
+      "href": "/friends"
+    },
+    {
+      "title": "Photos",
+      "href": "/photos"
+    },
+    {
+      "title": "Account",
+      "href": "/account"
+    },
+    {
+      "href": "/",
+      "rel": ["self"]
+    }
+  ]
+}
 ```
