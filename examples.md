@@ -49,7 +49,8 @@ The user instructs the client to follow the link to the signup resource.
       "rel": ["rel:validator"],
       "accept": "application/javascript"
     },
-    { "href": "/",
+    {
+      "href": "/",
       "rel": ["self"]
     }
   ],
@@ -181,7 +182,7 @@ that property is notionally valid.
 
 When the server rejects a representation submitted by the client the status
 code is 422 and errors are returned as an object on the `_errors` property of
-the response. The property name of the resource object corresponds to the
+the response. The property name of the errors object corresponds to the
 property on the representation, the property value is an array of error strings
 pertaining to that property.
 
