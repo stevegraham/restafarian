@@ -16,10 +16,10 @@ ActionDispatch::Routing::Mapper.class_eval do
 end
 
 Mime::Type.register \
-  'application/vnd.restafarian.resource+json', :restafarian_json
+  'application/vnd.restafarian+json', :restafarian_json
 
 Mime::Type.register \
-  'application/vnd.restafarian.resource+js', :restafarian_js
+  'application/vnd.restafarian+js', :restafarian_js
 
 ActionController::Renderers.add(:restafarian_json) do |object, options|
   self.content_type ||= Mime::RESTAFARIAN_JSON

@@ -2,11 +2,13 @@ Dummy::Application.routes.draw do
   restafarian_routes
 
   with_options only: %i<index show create update destroy> do |r|
-    r.resource  :widget do
-      resources :lols
+    r.resource :widget
+    r.resource :user
+    r.resource :signup
+
+    r.resource :documents do
+      r.resources :attachments
     end
-    r.resources :bank_accounts
-    r.resources :charges, only: %i<index show>
   end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -4,7 +4,7 @@ describe Restafarian do
   describe 'HATEOAS' do
     describe 'entering the API at the root' do
       before do
-        header 'Accept', 'application/vnd.restafarian.resource+json; version=1; charset=utf-8'
+        header 'Accept', 'application/vnd.restafarian+json; version=1; charset=utf-8'
       end
 
       context 'when the client makes a request with a Restafarian media type' do
@@ -16,7 +16,7 @@ describe Restafarian do
 
         it 'returns the correct media type' do
           expect(last_response.headers['Content-Type']).
-            to eq('application/vnd.restafarian.resource+json; version=1; charset=utf-8')
+            to eq('application/vnd.restafarian+json; version=1; charset=utf-8')
         end
 
         it 'returns JSON' do
@@ -27,9 +27,10 @@ describe Restafarian do
           body = JSON.parse(last_response.body)
 
           children = {
-            "widget" => "http://example.org/widget",
-            "bank_accounts"=>"http://example.org/bank_accounts",
-            "charges"=>"http://example.org/charges"
+            "widget"   => "/widget",
+            "user"     => "/user",
+            "signup"   => "/signup",
+            "document" => "/documents"
           }
 
           expect(body['child_resources']).to eq(children)
@@ -40,7 +41,7 @@ describe Restafarian do
     describe 'requesting a resource specification' do
       context 'when the client makes a request with a Restafarian media type' do
         before do
-          header 'Accept', 'application/vnd.restafarian.resource+js; version=1'
+          header 'Accept', 'application/vnd.restafarian+js; version=1'
           get    '/widget'
         end
 
