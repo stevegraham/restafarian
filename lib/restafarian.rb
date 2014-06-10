@@ -18,9 +18,6 @@ end
 Mime::Type.register \
   'application/vnd.restafarian+json', :restafarian_json
 
-Mime::Type.register \
-  'application/vnd.restafarian+js', :restafarian_js
-
 ActionController::Renderers.add(:restafarian_json) do |object, options|
   self.content_type ||= Mime::RESTAFARIAN_JSON
   object.kind_of?(String) ? object : object.to_json(options)

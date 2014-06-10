@@ -1,9 +1,8 @@
 module Restafarian
-  class RootController < ::ApplicationController
+  class RootController < Controller
     def index
       # raise request.path.inspect
-      render json: { child_resources: child_resources },
-             content_type: 'application/vnd.restafarian+json; version=1'
+      respond_with _links: child_resources
     end
   end
 end
